@@ -1,9 +1,14 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { ValidationPipe } from '@nestjs/common';
+import { config } from 'dotenv';
+config(); // Load .env file manually
 
+// console.log('🚀 Mongo URL:', process.env.MONGO_URL);
 async function bootstrap() {
   try {
     const app = await NestFactory.create(AppModule);
+    app.useGlobalPipes(new ValidationPipe());
     const port = process.env.PORT ?? 3000;
     await app.listen(port);
     console.log(`Application is running on: http://localhost:${port}`);
@@ -12,4 +17,7 @@ async function bootstrap() {
     process.exit(1);
   }
 }
-bootstrap();
+bootstrap().catch((error) => {
+  console.error('Failed to bootstrap application:', error);
+  process.exit(1);
+});
