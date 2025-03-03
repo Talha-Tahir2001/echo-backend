@@ -6,6 +6,8 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
+  BadRequestException,
 } from '@nestjs/common';
 import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
@@ -21,8 +23,21 @@ export class CommentsController {
   }
 
   @Get()
-  findAll() {
-    return this.commentsService.findAll();
+  findAll(@Query() queryParams: { parentId?: string }) {
+    if (queryParams.parentId) {
+      try {
+        return this.commentsService.getCommentsbyParentId(queryParams.parentId);
+      } catch (error) {
+        if (error instanceof Error) {
+          throw new BadRequestException('Something bad happened', {
+            cause: new Error(error.message),
+            description: 'Some error description',
+          });
+        }
+        throw error;
+      }
+    }
+    return this.commentsService.getTopLevelComments();
   }
 
   @Get(':id')
