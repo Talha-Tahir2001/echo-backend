@@ -10,6 +10,7 @@ async function bootstrap() {
   try {
     const app = await NestFactory.create(AppModule);
     app.useGlobalPipes(new ValidationPipe());
+    app.enableCors();
     app.useGlobalFilters(new ValidationErrorFilter());
     const port = process.env.PORT ?? 3000;
     await app.listen(port);
